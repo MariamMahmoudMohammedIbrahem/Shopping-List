@@ -1,6 +1,5 @@
 package eg.test.unitconverter
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -9,13 +8,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -62,7 +68,7 @@ fun ShoppingList(){
             items(
                 sItems
             ){
-                shoppingListItem(it, {},{})
+                ShoppingListItem(it, {},{})
             }
         }
     }
@@ -75,7 +81,10 @@ fun ShoppingList(){
                 TextButton(
                     onClick = {
                         if(name.isNotBlank()){
-                            sItems.plus(ShoppingItem(sItems.size+1,name, quantity.toInt()))
+                            val newItem = ShoppingItem(sItems.size+1,name, quantity.toInt())
+                            sItems += newItem
+                            print(sItems)
+//                            sItems.plus(ShoppingItem(sItems.size+1,name, quantity.toInt()))
                             showAlertDialog = false
                             name =""
                             quantity = ""
@@ -130,7 +139,7 @@ fun ShoppingList(){
 }
 
 @Composable
-fun shoppingListItem(
+fun ShoppingListItem(
     item: ShoppingItem,
     onEditClick:()->Unit,
     onDeleteClick:()->Unit,
@@ -144,10 +153,77 @@ fun shoppingListItem(
                     Color(0xFF018786),
                 ),
                 shape = RoundedCornerShape(20),
-            )
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween
     ){
         Text(text = item.name, modifier = Modifier.padding(8.dp))
+        Text(text = "Qty: ${item.quantity}", modifier = Modifier.padding(8.dp))
+        IconButton(
+            onClick = onEditClick,
+            modifier = Modifier.size(60.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit Icon",
+                tint = Color.Gray,
+            )
+        }
+        IconButton(
+            onClick = onDeleteClick,
+            modifier = Modifier.size(60.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete Icon",
+                tint = Color.Gray,
+            )
+        }
     }
 }
 
+@Composable
+fun ShoppingItemEditor(item: ShoppingItem, onEditComplete:(String,Int) -> Unit){
+    var editedName by remember {
+        mutableStateOf(item.name)
+    }
+    var editedQuantity by remember {
+        mutableStateOf(item.quantity.toString())
+    }
+    var isEditing by remember {
+        mutableStateOf(item.isEditing)
+    }
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+    ){
+        Column {
+            BasicTextField(
+                value = editedName,
+                onValueChange = {editedName = it},
+                singleLine = true,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(8.dp)
+            )
+            BasicTextField(
+                value = editedQuantity,
+                onValueChange = {editedQuantity = it},
+                singleLine = true,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(8.dp)
+            )
+        }
+        Button(
+            onClick = {
+                isEditing = false
+                onEditComplete(editedName, editedQuantity.toIntOrNull()?:1)
+            }
+        ) {
+
+        }
+    }
+}
 data class ShoppingItem(val id: Int, var name: String, var quantity: Int, var isEditing: Boolean = false)
