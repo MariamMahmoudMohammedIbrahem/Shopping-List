@@ -1,11 +1,12 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.bosta.shoppinglist"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.bosta.shoppinglist"
@@ -50,6 +51,23 @@ android {
 }
 
 dependencies {
+
+    //compose view model
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
+    // network calls
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+
+    // json to kotlin object mapping
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //image loading
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
+    // navigation
+    val nav_version = "2.7.4"
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
